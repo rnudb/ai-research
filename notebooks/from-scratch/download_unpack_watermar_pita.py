@@ -1,7 +1,7 @@
 from datasets import load_dataset
 
 import os
-from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
 
 dataset = load_dataset("bastienp/visible-watermark-pita")
 
@@ -14,7 +14,6 @@ def save_images(dataset, folder):
 def save_csv(dataset, filename):
     dataset.select_columns(dataset.column_names[1:]).to_csv(filename, index=False)
 
-
 # Function that saves the images and the rest of the data to a folder and a csv file
 def save_dataset(dataset, dataset_name="data"):
     """
@@ -22,11 +21,14 @@ def save_dataset(dataset, dataset_name="data"):
     Save each split of the dataset to a separate folder
     """
     os.makedirs(dataset_name, exist_ok=True)
-    with ThreadPoolExecutor() as executor:
+    with multiprocessing.Pool() as pool:
         for split, data in dataset.items():
             folder = f"{dataset_name}/{split}"
             os.makedirs(folder, exist_ok=True)
-            executor.submit(save_images, data, folder)
-            executor.submit(save_csv, data, f"{folder}.csv")
+            pool.apply_async(save_images, (data, folder))
+            pool.apply_async(save_csv, (data, f"{folder}.csv"))
+        pool.close()
+        pool.join()
+
 
 save_dataset(dataset, dataset_name="visible_watermark_pita")

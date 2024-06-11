@@ -20,8 +20,11 @@ torchvision = "^0.17.1"
 torchaudio = "^2.2.1"
 transformers = "^4.38.2"
 torchsummary = "^1.5.1"
+pyspark = "^3.5.1"
 
 
+[tool.poetry.dev-dependencies]
+ipykernel = "^6.29.4"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
